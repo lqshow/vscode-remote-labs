@@ -19,12 +19,38 @@
 		"--security-opt",
 		"seccomp=unconfined",
 
+		"--privileged",
+		"--name=vscode-remote-labs",
+
+		// "--network=host",
+
 		// Mount .ssh folder to /root/.ssh-localhost
-		"-v", "${env:HOME}${env:USERPROFILE}/.ssh:/root/.ssh-localhost:ro"
+		"-v", "${env:HOME}${env:USERPROFILE}/.ssh:/root/.ssh-localhost:ro",
+
+		// Mounts the KUBECONFIG file
+		"-v", "${env:HOME}${env:USERPROFILE}/.kube:/root/.kube-localhost",
+
+		// 挂载本地的 vscode extensions 到容器，避免在容器中重新安装扩展
+		// "-v", "${env:HOME}${env:USERPROFILE}/.vscode/extensions:/root/.vscode-server/extensions"
+	],
+
+	"containerEnv": {
+		// [Optional] Sync localhost kubeconfig flag
+		"SYNC_LOCALHOST_KUBECONFIG": "true",
+	},
+
+	// Use 'initializeCommand' to run on the host machine before the container is created
+	"initializeCommand": [
+		"${localWorkspaceFolder}/.devcontainer/export-local-kube-config.sh",
 	],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": [
+		"${containerWorkspaceFolder}/.devcontainer/run-devbox.sh"
+	],
+
+	// Use 'postAttachCommand' to run commands after VS Code has attached to a running container (in all cases).
+	"postAttachCommand": [
 		"${containerWorkspaceFolder}/.devcontainer/run-devbox.sh"
 	],
 
@@ -44,7 +70,6 @@
 	// Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	// "remoteUser": "vscode",
 	"features": {
-		"kubectl-helm-minikube": "latest",
-		"git": "latest"
+		// "git": "latest"
 	}
 }

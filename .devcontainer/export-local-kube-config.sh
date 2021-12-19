@@ -9,16 +9,6 @@ done
 bin="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 cd $bin
 
-# Setting ssh config
-mkdir -p /root/.ssh && cp -r /root/.ssh-localhost/* /root/.ssh && chmod 700 /root/.ssh && chmod 600 /root/.ssh/*
-
-# Setting the namespace preference
-namespace="default"
-if [[ $KUBERNETES_NAMESPACE ]]; then
-  namespace=${KUBERNETES_NAMESPACE}
-fi
-
-kubectl config set-context --current --namespace=${namespace}
-
-# Debug your Kubernetes service locally, using your favorite debugging tool.
-telepresence connect
+source ~/.bash_profile
+# Extracting context from merging kubeconfig file
+kubectl config view --merge --flatten > ~/.kube/gen-config
